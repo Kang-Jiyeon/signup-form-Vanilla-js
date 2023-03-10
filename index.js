@@ -22,94 +22,55 @@ const PW_REGEX = new RegExp("^[a-zA-Z0-9]{8,16}$");
 const MAX_FONT_SIZE = 20;
 const MIN_FONT_SIZE = 12;
 
-const ID_ERROR_MSG = {
+const ERROR_MSG = {
   required: "필수 정보입니다.",
-  invalid: "5~20자의 영문 소문자, 숫자와 특수기호(_),(-)만 사용 가능합니다.",
+  invalidId: "5~20자의 영문 소문자, 숫자와 특수기호(_),(-)만 사용 가능합니다.",
+  invalidPw: "8~16자 영문 대 소문자, 숫자를 사용하세요.",
+  invalidPwCheck: "비밀번호가 일치하지 않습니다.",
 };
 
-const PW_ERROR_MSG = {
-  required: "필수 정보입니다.",
-  invalid: "8~16자 영문 대 소문자, 숫자를 사용하세요.",
-};
-
-const PW_CHECK_ERROR_MSG = {
-  required: "필수 정보입니다.",
-  invalid: "비밀번호가 일치하지 않습니다.",
-};
-
-const checkIdRegex = (value) => {
+const checkRegex = (target) => {
+  const { value, id } = target;
   if (value.length === 0) {
     return "required";
   } else {
-    return ID_REGEX.test(value) ? true : "invalid";
+    switch (id) {
+      case "id":
+        return ID_REGEX.test(value) ? true : "invalidId";
+      case "pw":
+        return PW_REGEX.test(value) ? true : "invalidPw";
+      case "pw-check":
+        return value === $pw.value ? true : "invalidPwCheck";
+    }
   }
 };
 
-const checkIdValidation = (value) => {
-  const isValidId = checkIdRegex(value);
+const checkValidation = (target, msgTarget) => {
+  const isValidId = checkRegex(target);
+
   if (isValidId !== true) {
-    $id.classList.add("border-red-600");
-    $idMsg.innerText = ID_ERROR_MSG[isValidId];
+    target.classList.add("border-red-600");
+    msgTarget.innerText = ERROR_MSG[isValidId];
   } else {
-    $id.classList.remove("border-red-600");
-    $idMsg.innerText = "";
+    target.classList.remove("border-red-600");
+    msgTarget.innerText = "";
   }
+
   return isValidId;
 };
 
-const checkPwRegex = (value) => {
-  if (value.length === 0) {
-    return "required";
-  } else {
-    return PW_REGEX.test(value) ? true : "invalid";
-  }
-};
-
-const checkPwValidation = (value) => {
-  const isValidPw = checkPwRegex(value);
-
-  if (isValidPw !== true) {
-    $pw.classList.add("border-red-600");
-    $pwMsg.innerText = PW_ERROR_MSG[isValidPw];
-  } else {
-    $pw.classList.remove("border-red-600");
-    $pwMsg.innerText = "";
-  }
-  return isValidPw;
-};
-
-const checkPwCheckRegex = (value) => {
-  if (value.length === 0) {
-    return "required";
-  } else {
-    return value === $pw.value ? true : "invalid";
-  }
-};
-
-const checkPwCheckValidation = (value) => {
-  let isValidPwCheck = checkPwCheckRegex(value);
-
-  if (isValidPwCheck !== true) {
-    $pwCheck.classList.add("border-red-600");
-    $pwCheckMsg.innerText = PW_CHECK_ERROR_MSG[isValidPwCheck];
-  } else {
-    $pwCheck.classList.remove("border-red-600");
-    $pwCheckMsg.innerText = "";
-  }
-  return isValidPwCheck;
-};
-
-$id.addEventListener("focusout", () => checkIdValidation($id.value));
-$pw.addEventListener("focusout", () => checkPwValidation($pw.value));
+$id.addEventListener("focusout", () => checkValidation($id, $idMsg));
+$pw.addEventListener("focusout", () => checkValidation($pw, $pwMsg));
 $pwCheck.addEventListener("focusout", () =>
-  checkPwCheckValidation($pwCheck.value)
+  checkValidation($pwCheck, $pwCheckMsg)
 );
+
 $submit.addEventListener("click", (e) => {
   e.preventDefault();
   const isValidForm =
-    checkIdValidation($id.value) === true &&
-    checkPwValidation($pw.value) === true &&
-    checkPwCheckValidation($pwCheck.value) === true;
+    checkValidation($id, $idMsg) === true &&
+    checkValidation($pw, $pwMsg) === true &&
+    checkValidation($pwCheck, $pwCheck) === true;
 
   if (isValidForm) {
     $confirmId.innerText = $id.value;
