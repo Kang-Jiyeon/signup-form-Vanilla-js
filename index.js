@@ -7,6 +7,11 @@ const $pwMsg = document.getElementById("pw-msg");
 const $pwCheck = document.getElementById("pw-check");
 const $pwCheckMsg = document.getElementById("pw-check-msg");
 const $submit = document.getElementById("submit");
+const $modal = document.getElementById("modal");
+const $confirmId = document.getElementById("confirm-id");
+const $confirmPw = document.getElementById("confirm-pw");
+const $cancelBtn = document.getElementById("cancel-btn");
+const $approveBtn = document.getElementById("approve-btn");
 
 const ID_REGEX = new RegExp("^[a-z0-9_-]{5,20}$");
 const PW_REGEX = new RegExp("^[a-zA-Z0-9]{8,16}$");
@@ -26,33 +31,36 @@ const PW_CHECK_ERROR_MSG = {
   invalid: "비밀번호가 일치하지 않습니다.",
 };
 
-const checkIdValidation = (value) => {
-  let isValidId;
+const checkIdRegex = (value) => {
   if (value.length === 0) {
-    isValidId = "required";
+    return "required";
   } else {
-    isValidId = ID_REGEX.test(value) ? true : "invalid";
+    return ID_REGEX.test(value) ? true : "invalid";
   }
-  console.log(isValidId);
+};
 
+const checkIdValidation = (value) => {
+  const isValidId = checkIdRegex(value);
   if (isValidId !== true) {
-    // isValidId -> invalid, required
     $id.classList.add("border-red-600");
     $idMsg.innerText = ID_ERROR_MSG[isValidId];
   } else {
     $id.classList.remove("border-red-600");
     $idMsg.innerText = "";
   }
+  return isValidId;
+};
+
+const checkPwRegex = (value) => {
+  if (value.length === 0) {
+    return "required";
+  } else {
+    return PW_REGEX.test(value) ? true : "invalid";
+  }
 };
 
 const checkPwValidation = (value) => {
-  let isValidPw;
-  if (value.length === 0) {
-    isValidPw = "required";
-  } else {
-    isValidPw = PW_REGEX.test(value) ? true : "invalid";
-  }
-  console.log(isValidPw);
+  const isValidPw = checkPwRegex(value);
 
   if (isValidPw !== true) {
     $pw.classList.add("border-red-600");
@@ -61,15 +69,19 @@ const checkPwValidation = (value) => {
     $pw.classList.remove("border-red-600");
     $pwMsg.innerText = "";
   }
+  return isValidPw;
+};
+
+const checkPwCheckRegex = (value) => {
+  if (value.length === 0) {
+    return "required";
+  } else {
+    return value === $pw.value ? true : "invalid";
+  }
 };
 
 const checkPwCheckValidation = (value) => {
-  let isValidPwCheck;
-  if (value.length === 0) {
-    isValidPwCheck = "required";
-  } else {
-    isValidPwCheck = $pw.value === value ? true : "invalid";
-  }
+  let isValidPwCheck = checkPwCheckRegex(value);
 
   if (isValidPwCheck !== true) {
     $pwCheck.classList.add("border-red-600");
@@ -78,6 +90,7 @@ const checkPwCheckValidation = (value) => {
     $pwCheck.classList.remove("border-red-600");
     $pwCheckMsg.innerText = "";
   }
+  return isValidPwCheck;
 };
 
 $id.addEventListener("focusout", () => checkIdValidation($id.value));
@@ -87,7 +100,22 @@ $pwCheck.addEventListener("focusout", () =>
 );
 $submit.addEventListener("click", (e) => {
   e.preventDefault();
-  checkIdValidation($id.value);
-  checkPwValidation($pw.value);
-  checkPwCheckValidation($pwCheck.value);
+  const isValidForm =
+    checkIdValidation($id.value) === true &&
+    checkPwValidation($pw.value) === true &&
+    checkPwCheckValidation($pwCheck.value) === true;
+
+  if (isValidForm) {
+    $confirmId.innerText = $id.value;
+    $confirmPw.innerText = $pw.value;
+    $modal.showModal();
+  }
+});
+
+$cancelBtn.addEventListener("click", () => {
+  $modal.close();
+});
+
+$approveBtn.addEventListener("click", () => {
+  window.alert("가입되었습니다 😊");
 });
