@@ -12,9 +12,15 @@ const $confirmId = document.getElementById("confirm-id");
 const $confirmPw = document.getElementById("confirm-pw");
 const $cancelBtn = document.getElementById("cancel-btn");
 const $approveBtn = document.getElementById("approve-btn");
+const $increaseFontBtn = document.getElementById("increase-font-btn");
+const $decreaseFontBtn = document.getElementById("decrease-font-btn");
+const $html = document.documentElement;
 
 const ID_REGEX = new RegExp("^[a-z0-9_-]{5,20}$");
 const PW_REGEX = new RegExp("^[a-zA-Z0-9]{8,16}$");
+
+const MAX_FONT_SIZE = 20;
+const MIN_FONT_SIZE = 12;
 
 const ID_ERROR_MSG = {
   required: "필수 정보입니다.",
@@ -119,3 +125,23 @@ $cancelBtn.addEventListener("click", () => {
 $approveBtn.addEventListener("click", () => {
   window.alert("가입되었습니다 😊");
 });
+
+const getHtmlFontSize = () => {
+  return parseFloat(window.getComputedStyle($html).fontSize);
+};
+
+$increaseFontBtn.addEventListener("click", () => {
+  onClickFontSizeControl("increase");
+});
+
+$decreaseFontBtn.addEventListener("click", () => {
+  onClickFontSizeControl("decrease");
+});
+
+const onClickFontSizeControl = (flag) => {
+  const fontSize = getHtmlFontSize();
+  let newFontSize = flag === "increase" ? fontSize + 1 : fontSize - 1;
+  $html.style.fontSize = newFontSize;
+  $decreaseFontBtn.disabled = newFontSize <= MIN_FONT_SIZE;
+  $increaseFontBtn.disabled = newFontSize >= MAX_FONT_SIZE;
+};
