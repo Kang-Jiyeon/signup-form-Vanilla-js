@@ -84,7 +84,7 @@ $cancelBtn.addEventListener("click", () => {
 });
 
 $approveBtn.addEventListener("click", () => {
-  window.alert("가입되었습니다 😊");
+  window.alert("가입되었습니다");
 });
 
 const getHtmlFontSize = () => {
